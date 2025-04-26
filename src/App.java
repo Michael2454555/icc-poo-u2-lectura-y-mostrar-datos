@@ -21,9 +21,7 @@ public class App {
         }
     }
 
-    /**
-     * Lee una línea que debe cumplir el regex, mostrando mensaje de error si no.
-     */
+    
     private static String leerConPatron(Scanner sc, String mensaje, String regex, String errorMsg) {
         String valor;
         while (true) {
