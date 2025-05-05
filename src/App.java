@@ -2,9 +2,7 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 public class App {
     static class RegistroCliente implements Serializable {
@@ -91,9 +89,11 @@ public class App {
             System.out.println("No hay datos para mostrar.");
             return;
         }
-        System.out.printf("%-15s %-20s %-10s %s%n", "Nombre", "Dirección", "Sueldo", "Fecha");
+        System.out.printf("%-5s %-15s %-20s %-10s %s%n", "#", "Nombre", "Dirección", "Sueldo", "Fecha");
+        int i = 1;
         for (RegistroCliente c : lista) {
-            System.out.printf("%-15s %-20s $%-9.2f %s%n", c.nombre, c.direccion, c.sueldo, c.fechaNacimiento);
+            System.out.printf("%-5d %-15s %-20s $%-9.2f %s%n",
+                i++, c.nombre, c.direccion, c.sueldo, c.fechaNacimiento);
         }
     }
 
@@ -189,6 +189,70 @@ public class App {
         }
     }
 
+    // ----- MÉTODOS DE ORDENAMIENTO -----
+
+    public static void ordenarPorSueldoDesc(List<RegistroCliente> lista) {
+        if (lista.isEmpty()) {
+            System.out.println("No hay clientes para ordenar.");
+            return;
+        }
+        lista.sort((c1, c2) -> Double.compare(c2.sueldo, c1.sueldo));
+        System.out.println("Clientes ordenados por sueldo (mayor a menor):");
+        mostrarDatos(lista);
+    }
+
+    public static void ordenarPorSueldoAsc(List<RegistroCliente> lista) {
+        if (lista.isEmpty()) {
+            System.out.println("No hay clientes para ordenar.");
+            return;
+        }
+        lista.sort(Comparator.comparingDouble(c -> c.sueldo));
+        System.out.println("Clientes ordenados por sueldo (menor a mayor):");
+        mostrarDatos(lista);
+    }
+
+    public static void ordenarPorNombreAZ(List<RegistroCliente> lista) {
+        if (lista.isEmpty()) {
+            System.out.println("No hay clientes para ordenar.");
+            return;
+        }
+        lista.sort(Comparator.comparing(c -> c.nombre.toLowerCase()));
+        System.out.println("Clientes ordenados por nombre (A-Z):");
+        mostrarDatos(lista);
+    }
+
+    public static void ordenarPorNombreZA(List<RegistroCliente> lista) {
+        if (lista.isEmpty()) {
+            System.out.println("No hay clientes para ordenar.");
+            return;
+        }
+        lista.sort((c1, c2) -> c2.nombre.toLowerCase().compareTo(c1.nombre.toLowerCase()));
+        System.out.println("Clientes ordenados por nombre (Z-A):");
+        mostrarDatos(lista);
+    }
+
+    // ----- ELIMINAR CLIENTE -----
+
+    public static void eliminarCliente(List<RegistroCliente> lista) {
+        if (lista.isEmpty()) {
+            System.out.println("No hay clientes para eliminar.");
+            return;
+        }
+        mostrarDatos(lista);
+        System.out.print("Ingrese el número del cliente a eliminar (1 a " + lista.size() + "): ");
+        try {
+            int indice = Integer.parseInt(sc.nextLine());
+            if (indice >= 1 && indice <= lista.size()) {
+                RegistroCliente eliminado = lista.remove(indice - 1);
+                System.out.println("Cliente eliminado: " + eliminado.nombre);
+            } else {
+                System.out.println("Índice fuera de rango.");
+            }
+        } catch (NumberFormatException e) {
+            System.out.println("Entrada inválida.");
+        }
+    }
+
     public static void main(String[] args) {
         List<RegistroCliente> clientes = new ArrayList<>();
         int opcion;
@@ -203,7 +267,13 @@ public class App {
             System.out.println("7. Leer bin1");
             System.out.println("8. Leer bin2");
             System.out.println("9. Salir");
-            System.out.print("Seleccione una opción: ");
+            System.out.println("10. Ordenar clientes por sueldo (descendente)");
+            System.out.println("11. Ordenar clientes por sueldo (ascendente)");
+            System.out.println("12. Ordenar clientes por nombre (A-Z)");
+            System.out.println("13. Ordenar clientes por nombre (Z-A)");
+            System.out.println("14. Eliminar cliente atendido");
+            System.out.print("Seleccione una opcion: ");
+
             try {
                 opcion = Integer.parseInt(sc.nextLine());
             } catch (NumberFormatException e) {
@@ -211,35 +281,21 @@ public class App {
             }
 
             switch (opcion) {
-                case 1:
-                    ingresarDatos(clientes);
-                    break;
-                case 2:
-                    mostrarDatos(clientes);
-                    break;
-                case 3:
-                    grabarTexto(clientes);
-                    break;
-                case 4:
-                    grabarBin1(clientes);
-                    break;
-                case 5:
-                    grabarBin2(clientes);
-                    break;
-                case 6:
-                    leerTexto();
-                    break;
-                case 7:
-                    leerBin1();
-                    break;
-                case 8:
-                    leerBin2();
-                    break;
-                case 9:
-                    System.out.println("Saliendo del programa. ¡Hasta luego!");
-                    break;
-                default:
-                    System.out.println("Opción inválida. Intente de nuevo.");
+                case 1:  ingresarDatos(clientes);         break;
+                case 2:  mostrarDatos(clientes);          break;
+                case 3:  grabarTexto(clientes);           break;
+                case 4:  grabarBin1(clientes);            break;
+                case 5:  grabarBin2(clientes);            break;
+                case 6:  leerTexto();                     break;
+                case 7:  leerBin1();                      break;
+                case 8:  leerBin2();                      break;
+                case 9:  System.out.println("Saliendo del programa. ¡Hasta luego!"); break;
+                case 10: ordenarPorSueldoDesc(clientes);  break;
+                case 11: ordenarPorSueldoAsc(clientes);   break;
+                case 12: ordenarPorNombreAZ(clientes);    break;
+                case 13: ordenarPorNombreZA(clientes);    break;
+                case 14: eliminarCliente(clientes);       break;
+                default: System.out.println("Opción inválida. Intente de nuevo.");
             }
         } while (opcion != 9);
     }
